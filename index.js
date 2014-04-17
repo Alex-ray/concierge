@@ -50,12 +50,19 @@
   concierge.off          = off ;
   concierge.once         = once ;
   concierge.emit         = emit ;
-  concierge.listeners    = listeners ;
-  concierge.hasListeners = hasListeners ;
 
   global.concierge = concierge ;
 
+  /**
+   * Convert a given `object` to inhert concierge's api
+   * @param {Object} object
+   * @return {Object} object
+   * @api public
+   */
+
   function convert ( object ) {
+    concierge._callbacks = { } ;
+
     var keys = Object.keys( concierge ) ;
 
     for ( var i = 0; i < keys.length; i++ ) {
@@ -68,13 +75,101 @@
     }
 
     return object ;
-
   }
 
-  function on (){}
-  function off (){}
-  function once (){}
-  function emit (){}
-  function listeners(){}
-  function hasListeners(){}
+  /**
+   * Listen on the givin `event` with `fn`
+   * @param {String} event
+   * @param {Function} fn
+   * @return {Object} emitter
+   * @api public
+   */
+
+  function on ( event, fn ) {
+    if ( this._callbacks[ event ] === undefined ) {
+      this._callbacks[ event ] = [ ] ;
+    }
+
+    this._callbacks[ event ].push( fn ) ;
+
+    return this ;
+  }
+
+  /**
+   * Remove callback `fn` for `event` or remove all callbacks
+   * @param {String} event
+   * @param {Function} fn
+   * @return {Object} emitter
+   * @api public
+   */
+
+  function off ( event, fn ) {
+    if ( this._callbacks[ event ] === undefined ) {
+      this._callbacks = { } ;
+      return this ;
+    }
+
+    // remove all handlers
+    if ( fn === undefined ) {
+      delete this._callbacks[ event ] ;
+      return this ;
+    }
+
+    // remove specific handler
+    var cb ;
+    for ( var i = 0; i < this._callbacks[ event ].length; i++ ) {
+      cb = this._callbacks[ event ][ i ] ;
+      if ( cb === fn || cb.fn === fn ) {
+        this._callbacks[ event ].splice( i, 1 ) ;
+        break ;
+      }
+    }
+
+    return this ;
+  }
+
+  /**
+   * Add callback 'fn' for 'event' and remove when 'fn' is emitted
+   * @param {String} event
+   * @param {Function} fn
+   * @return {Object} emitter
+   * @api public
+   */
+
+  function once ( event, fn ) {
+    var self = this;
+
+    function on ( ) {
+      self.off( event, on ) ;
+      fn.apply( this, arguments ) ;
+    }
+
+    on.fn = fn ;
+    this.on( event, on ) ;
+
+    return this ;
+  }
+
+  /**
+   * call all callbacks in 'event' with args list
+   * @param {String} event
+   * @return {Object} emitter
+   * @api public
+   */
+  function emit ( event ) {
+    if ( this._callbacks[ event ] === undefined ) {
+      return this ;
+    }
+
+    var args = [].slice.call( arguments, 1 ) ;
+    var cbs  = this._callbacks[ event ] ;
+
+    for ( var i = 0; i < cbs.length; i++ ) {
+      var cb = cbs[ i ] ;
+      cb.apply( this, args ) ;
+    }
+
+    return this ;
+  }
+
 }( exports === undefined ? window : exports ) );
