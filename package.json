@@ -24,6 +24,7 @@
     "url": "https://github.com/Alex-ray/concierge/issues"
   },
   "devDependencies": {
-    "chai": "~1.9.1"
+    "chai" : "*",
+    "mocha" : "*"
   }
 }
