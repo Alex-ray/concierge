@@ -1,0 +1,26 @@
+{
+  "name": "concierge",
+  "version": "0.0.0",
+  "description": "A simple fast async deferred event library",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Alex-ray/concierge.git"
+  },
+  "keywords": [
+    "event",
+    "events",
+    "concierge",
+    "conciergejs",
+    "async",
+    "deferred"
+  ],
+  "author": "Alexander James Ray <alexjamesray@gmail.com> (http://alexray.me/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Alex-ray/concierge/issues"
+  }
+}
