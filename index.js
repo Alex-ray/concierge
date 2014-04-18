@@ -33,7 +33,9 @@
 
     for ( var i = 0; i < this.deferred.length; i++ ) {
       var fn = this.deferred[ i ] ;
-      next( fn.bind( context ) ) ;
+      if ( typeof fn === 'function' ) {
+        next( fn.bind( context ) ) ;
+      }
     }
 
     this.deferred = [ ] ;
@@ -119,7 +121,7 @@
     var cb ;
     for ( var i = 0; i < this._callbacks[ event ].length; i++ ) {
       cb = this._callbacks[ event ][ i ] ;
-      if ( cb === fn || cb.fn === fn ) {
+      if ( cb === fn || cb.once === true ) {
         this._callbacks[ event ].splice( i, 1 ) ;
         break ;
       }
@@ -140,11 +142,10 @@
     var self = this;
 
     function on ( ) {
-      self.off( event, on ) ;
       fn.apply( this, arguments ) ;
     }
 
-    on.fn = fn ;
+    on.once = true ;
     this.on( event, on ) ;
 
     return this ;
@@ -161,15 +162,36 @@
       return this ;
     }
 
-    var args = [].slice.call( arguments, 1 ) ;
-    var cbs  = this._callbacks[ event ] ;
+    var once    = [ ] ;
+    var args    = [].slice.call( arguments, 1 ) ;
+    var context = this ;
+    var cbs     = this._callbacks[ event ] ;
+    var queue   = new Shelve( ) ;
 
     for ( var i = 0; i < cbs.length; i++ ) {
       var cb = cbs[ i ] ;
-      cb.apply( this, args ) ;
+
+      if ( cb.once !== undefined ) {
+        once.push( i ) ;
+      }
+
+      var cb = _generateCallback( cbs[ i ], context, args ) ;
+      queue.defer( cb ) ;
     }
 
+    for ( var i = 0; i < once.length; i++ ) {
+      var removeIndex = once[ i ] ;
+      this._callbacks[ event ].splice(  removeIndex , 1 ) ;
+    }
+
+    queue.trigger( this ) ;
     return this ;
+  }
+
+  function _generateCallback ( cb, context, args ) {
+    return function ( ) {
+      cb.apply( this, args ) ;
+    } ;
   }
 
 }( exports === undefined ? window : exports ) );

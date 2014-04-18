@@ -82,32 +82,40 @@ describe( 'Concierge', function ( ){
   } ) ;
 
   describe( '#once', function ( ) {
-    it ( 'should add event and only emit once', function ( ) {
+    it ( 'should add event and only emit once', function ( done ) {
 
       var o = { } ;
-      var cbs = [ ] ;
+      var cbs1 = [ ] ;
+      var cbs2 = [ ] ;
       o.called = true ;
       var event = "1" ;
-      var cb1 = function ( ) { cbs.push( this.called ) ; } ;
+      var cb1 = function ( ) { cbs1.push( this.called ) ; } ;
+      var cb2 = function ( ) { cbs2.push( this.called ) ; if ( cbs2.length === 2 ) validate( ) ; } ;
+
       concierge.convert( o ) ;
 
       o.once( event, cb1 ) ;
+      o.on( event, cb2 ) ;
 
       o.emit( event ) ;
       o.emit( event ) ;
 
-      cbs.should.have.length( 1 ) ;
+      function validate ( ) {
+        cbs1.should.have.length( 1 ) ;
+        cbs2.should.have.length( 2 ) ;
+        done( ) ;
+      }
 
     } ) ;
   } ) ;
 
   describe( '#emit', function ( ) {
 
-    it ( 'should emit event for all callbacks', function ( ) {
+    it ( 'should emit event for all callbacks', function ( done ) {
       var o = { } ;
       var cbs = [ ] ;
-      o.event = '1' ;
-      var cb = function ( ) { cbs.push( this.event ) ; } ;
+      o.event = '2' ;
+      var cb = function ( ) { cbs.push( this.event ) ; if ( cbs.length === 3 ) validate( ) ; } ;
 
       concierge.convert( o ) ;
 
@@ -117,8 +125,37 @@ describe( 'Concierge', function ( ){
 
       o.emit( o.event ) ;
 
-      cbs.should.have.length( 3 ) ;
+      function validate ( ) {
+        cbs.should.have.length( 3 ) ;
+        done( ) ;
+      }
+
     }) ;
+
+
+    it ( 'should pass correct agruments to all callbacks : ', function ( done ) {
+      var o = { } ;
+      o.event = '3' ;
+      var testStr = 'foo' ;
+      var testInt = 1 ;
+      var testArr = ['bar'] ;
+      var testObj = {foo:'bar'} ;
+      var testBool = true ;
+
+      concierge.convert( o ) ;
+
+      o.on( o.event, function ( str, int, arr, obj, bool ) {
+        str.should.equal( testStr ) ;
+        int.should.equal( testInt ) ;
+        arr.should.equal( testArr ) ;
+        obj.should.equal( testObj ) ;
+        bool.should.equal( testBool ) ;
+        done( ) ;
+      } ) ;
+
+      o.emit( o.event , testStr , testInt , testArr , testObj , testBool )  ;
+
+    } ) ;
   } ) ;
 
 
