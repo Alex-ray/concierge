@@ -133,7 +133,7 @@ describe( 'Concierge', function ( ){
     }) ;
 
 
-    it ( 'should pass correct agruments to all callbacks : ', function ( done ) {
+    it ( 'should pass correct agruments to all callbacks ', function ( done ) {
       var o = { } ;
       o.event = '3' ;
       var testStr = 'foo' ;
@@ -156,6 +156,7 @@ describe( 'Concierge', function ( ){
       o.emit( o.event , testStr , testInt , testArr , testObj , testBool )  ;
 
     } ) ;
+
   } ) ;
 
 

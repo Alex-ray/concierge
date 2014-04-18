@@ -12,6 +12,13 @@
       return this ;
   }
 
+  /**
+   * add `fn` to deferred queue if shelve has not been triggered otherwise trigger it
+   * @param {Function} fn
+   * @return instance
+   * @api public
+   */
+
   Shelve.prototype.defer = function defer ( fn ) {
 
     // Check if deferreds have been triggered
@@ -23,8 +30,15 @@
       this.deferred.push( fn ) ;
     }
 
-
+    return this ;
   }
+
+  /**
+   * trigger all deferred callbacks and bind them to `context` otherwise bind to instance context
+   * @param {Object} context
+   * @return instance
+   * @api public
+   */
 
   Shelve.prototype.trigger = function trigger ( context ) {
 
@@ -40,6 +54,7 @@
 
     this.deferred = [ ] ;
 
+    return this ;
   }
 
   // Concierge
@@ -162,9 +177,9 @@
       return this ;
     }
 
-    var once    = [ ] ;
-    var args    = [].slice.call( arguments, 1 ) ;
     var context = this ;
+    var once    = [ ] ;
+    var args    = [ ].slice.call( arguments, 1 ) ;
     var cbs     = this._callbacks[ event ] ;
     var queue   = new Shelve( ) ;
 
@@ -185,12 +200,21 @@
     }
 
     queue.trigger( this ) ;
+
     return this ;
   }
 
+  /**
+   * creates a scoped callback that calls `cb` in the context of `context` with arguments `args`
+   * @param {Function} cb
+   * @param {Object} context
+   * @param {Array} args
+   * @return {Function} anonymous
+   * @api public
+   */
   function _generateCallback ( cb, context, args ) {
     return function ( ) {
-      cb.apply( this, args ) ;
+      cb.apply( context, args ) ;
     } ;
   }
 
