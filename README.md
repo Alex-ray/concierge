@@ -11,7 +11,7 @@ A simple deferred async event emitting library
   npm install concierge
 ```
 
-  **Browser** **:**
+  **Browser** **:**<br>
 download concierge.js and include it in your site directory
 
 ### Loading
