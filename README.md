@@ -4,12 +4,12 @@ A simple deferred async event emitting library
 
 ### Installation
 
-  **Node : **
+  **Node** :
 
   simply install through npm. ( node package manager )
   `npm install concierge`
 
-  **Browser : **
+  **Browser** :
   download concierge.js and include it in your site directory
 
 ### Loading
