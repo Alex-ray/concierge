@@ -12,6 +12,7 @@ A simple deferred async event emitting library
 ```
 
   **Browser** **:**<br>
+
 download concierge.js and include it in your site directory
 
 ### Loading
@@ -64,6 +65,9 @@ download concierge.js and include it in your site directory
 ```javascript
   o.emit( 'uniqEvent', arg1, arg2, ...) ;
 ```
+
+
+
 
 
 All methods are chain-able and the concierge object is available globally
