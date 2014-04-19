@@ -66,9 +66,7 @@ download concierge.js and include it in your site directory
   o.emit( 'uniqEvent', arg1, arg2, ...) ;
 ```
 
-
-
-
+---
 
 All methods are chain-able and the concierge object is available globally
 ```javascript
