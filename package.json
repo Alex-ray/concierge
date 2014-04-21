@@ -2,7 +2,7 @@
   "name": "concierge",
   "version": "1.0.0",
   "description": "A simple fast async deferred event library",
-  "main": "index.js",
+  "main": "concierge.js",
   "scripts": {
     "test": "mocha"
   },

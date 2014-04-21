@@ -2,7 +2,7 @@ var chai = require( 'chai' ).should( ) ;
 
 describe( 'Concierge', function ( ){
 
-  var concierge = require('../index').concierge ;
+  var concierge = require('../concierge').concierge ;
 
   hasDefaultProps( concierge ) ;
 
