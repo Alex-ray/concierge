@@ -3,13 +3,14 @@
 
   // Shelve
   // Async function execution for client side and server side
-  var next = (typeof process === 'undefined' || typeof process.nextTick === 'undefined' ) ? function (fn) { setTimeout(fn, 0); } : process.nextTick ;
+  var next;
 
-  function Shelve ( ) {
-      this.context ;
-      this.deferred = [ ] ;
+  if (typeof process === 'undefined' || typeof process.nextTick === 'undefined' ) {
+    next = function( fn ) { setTimeout( fn, 0 ) ; } ;
+  }
 
-      return this ;
+  else {
+    next = process.nextTick  ;
   }
 
   /**
