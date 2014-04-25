@@ -13,6 +13,13 @@
     next = process.nextTick  ;
   }
 
+  function Shelve ( ) {
+    this.context ;
+    this.deferred  = [ ] ;
+
+    return this ;
+  }
+
   /**
    * add `fn` to deferred queue if shelve has not been triggered otherwise trigger it
    * @param {Function} fn
@@ -42,20 +49,23 @@
    */
 
   Shelve.prototype.trigger = function trigger ( context ) {
+    var self = this ;
+    self.context = context === undefined ? self : context ;
+    var context = self.context ;
 
-    this.context = context === undefined ? this : context ;
-    var context = this.context ;
+    next( emit ) ;
 
-    for ( var i = 0; i < this.deferred.length; i++ ) {
-      var fn = this.deferred[ i ] ;
-      if ( typeof fn === 'function' ) {
-        next( fn.bind( context ) ) ;
+    return self ;
+
+    function emit ( ) {
+      for ( var i = 0; i < self.deferred.length; i++ ) {
+        var fn = self.deferred[ i ] ;
+        fn.call( self.context ) ;
       }
+
+      self.deferred = [ ] ;
     }
 
-    this.deferred = [ ] ;
-
-    return this ;
   }
 
   // Concierge
