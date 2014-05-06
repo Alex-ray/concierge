@@ -26,5 +26,8 @@
   "devDependencies": {
     "chai" : "*",
     "mocha" : "*"
+  },
+  "engines": {
+    "node": ">=0.6"
   }
 }
