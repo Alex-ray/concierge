@@ -1,6 +1,6 @@
 {
   "name": "concierge",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A simple fast async deferred event library",
   "main": "concierge.js",
   "scripts": {
@@ -24,10 +24,13 @@
     "url": "https://github.com/Alex-ray/concierge/issues"
   },
   "devDependencies": {
-    "chai" : "*",
-    "mocha" : "*"
+    "chai": "*",
+    "mocha": "*"
   },
   "engines": {
     "node": ">=0.6"
+  },
+  "dependencies": {
+    "shelve": "~1.0.1"
   }
 }
