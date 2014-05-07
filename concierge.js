@@ -156,7 +156,7 @@
    * @param {Object} context
    * @param {Array} args
    * @return {Function} anonymous
-   * @api public
+   * @api private
    */
   function _generateCallback ( cb, context, args ) {
     return function ( ) {
