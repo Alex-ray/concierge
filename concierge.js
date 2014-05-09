@@ -116,8 +116,6 @@
       return this ;
     }
 
-    this.deferred.context = undefined ;
-
     var context = this ;
     var once    = [ ] ;
     var args    = [ ].slice.call( arguments, 1 ) ;
