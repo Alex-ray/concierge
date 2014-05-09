@@ -137,8 +137,6 @@
       this._callbacks[ event ].splice(  removeIndex , 1 ) ;
     }
 
-    this.deferred.trigger( this ) ;
-
     return this ;
   }
 
