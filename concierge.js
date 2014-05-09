@@ -1,20 +1,17 @@
 ; ( function( global ){
   "use strict" ;
 
-  // Shelve
-  var Shelve = typeof global.Shelve === 'undefined' ? require( 'shelve' ).Shelve : global.Shelve ;
-
   // Concierge
-  var concierge = { } ;
+  function Concierge ( deferred ) {
+    this._callbacks = { } ;
+    this.deferred = deferred ;
+  }
 
-  concierge._callbacks   = { } ;
-  concierge.convert      = convert ;
-  concierge.on           = on ;
-  concierge.off          = off ;
-  concierge.once         = once ;
-  concierge.emit         = emit ;
-
-  global.concierge = concierge ;
+  Concierge.prototype.on      = on ;
+  Concierge.prototype.off     = off ;
+  Concierge.prototype.once    = once ;
+  Concierge.prototype.emit    = emit ;
+  Concierge.prototype.convert = convert ;
 
   /**
    * Convert a given `object` to inhert concierge's api
@@ -24,18 +21,13 @@
    */
 
   function convert ( object ) {
-    concierge._callbacks = { } ;
 
-    var keys = Object.keys( concierge ) ;
-
-    for ( var i = 0; i < keys.length; i++ ) {
-      var key = keys[ i ] ;
-
-      if ( object[ key ] === undefined ) {
-        object[ key ] = concierge[ key ] ;
-      }
-
-    }
+    object._callbacks = { } ;
+    object.deferred   = this.deferred ;
+    object.on   = this.on ;
+    object.off  = this.off ;
+    object.once = this.once ;
+    object.emit = this.emit ;
 
     return object ;
   }
@@ -80,6 +72,7 @@
 
     // remove specific handler
     var cb ;
+
     for ( var i = 0; i < this._callbacks[ event ].length; i++ ) {
       cb = this._callbacks[ event ][ i ] ;
       if ( cb === fn || cb.once === true ) {
@@ -123,11 +116,12 @@
       return this ;
     }
 
+    this.deferred.context = undefined ;
+
     var context = this ;
     var once    = [ ] ;
     var args    = [ ].slice.call( arguments, 1 ) ;
     var cbs     = this._callbacks[ event ] ;
-    var queue   = new Shelve( ) ;
 
     for ( var i = 0; i < cbs.length; i++ ) {
       var cb = cbs[ i ] ;
@@ -137,7 +131,7 @@
       }
 
       var cb = _generateCallback( cbs[ i ], context, args ) ;
-      queue.defer( cb ) ;
+      this.deferred.defer( cb ) ;
     }
 
     for ( var i = 0; i < once.length; i++ ) {
@@ -145,7 +139,7 @@
       this._callbacks[ event ].splice(  removeIndex , 1 ) ;
     }
 
-    queue.trigger( this ) ;
+    this.deferred.trigger( this ) ;
 
     return this ;
   }
@@ -164,4 +158,6 @@
     } ;
   }
 
-}( typeof window === "undefined" ? module.exports : window ) );
+  global.Concierge = Concierge ;
+
+}( typeof window === "undefined" ? this : window ) );

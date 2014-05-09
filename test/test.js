@@ -2,7 +2,10 @@ var chai = require( 'chai' ).should( ) ;
 
 describe( 'Concierge', function ( ){
 
-  var concierge = require('../concierge').concierge ;
+  var Concierge = require('../concierge').Concierge ;
+  var Shelve    = require( 'shelve' ).Shelve ;
+  var deferred  = new Shelve( ) ;
+  var concierge = new Concierge( deferred ) ;
 
   hasDefaultProps( concierge ) ;
 
@@ -89,7 +92,7 @@ describe( 'Concierge', function ( ){
       var cbs2 = [ ] ;
       o.called = true ;
       var event = "1" ;
-      var cb1 = function ( ) { cbs1.push( this.called ) ; } ;
+      var cb1 = function ( ) { cbs1.push( this.called );} ;
       var cb2 = function ( ) { cbs2.push( this.called ) ; if ( cbs2.length === 2 ) validate( ) ; } ;
 
       concierge.convert( o ) ;
