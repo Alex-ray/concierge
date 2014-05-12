@@ -17,14 +17,24 @@
 
   function convert ( object ) {
 
-    if ( typeof object._callbacks === "undefined" ) object._callbacks = { } ;
-    if ( typeof object._deferred  === "undefined" ) object._deferred  = this._deferred ;
-    if ( typeof object.on         === "undefined" ) object.on         = on ;
-    if ( typeof object.off        === "undefined" ) object.off        = off ;
-    if ( typeof object.once       === "undefined" ) object.once       = once ;
-    if ( typeof object.emit       === "undefined" ) object.emit       = emit ;
+    if ( object._callbacks === undefined &&
+         object._deferred  === undefined &&
+         object.on         === undefined &&
+         object.off        === undefined &&
+         object.once       === undefined &&
+         object.emit       === undefined ) {
 
-    return object ;
+      object._callbacks = { } ;
+      object._deferred  = this._deferred ;
+      object.on         = on ;
+      object.off        = off ;
+      object.once       = once ;
+      object.emit       = emit ;
+
+      return true ;
+    }
+
+    return false ;
   }
 
   /**
