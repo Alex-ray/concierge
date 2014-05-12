@@ -1,6 +1,6 @@
 {
   "name": "concierge",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A simple fast async deferred event library",
   "main": "concierge.js",
   "scripts": {
