@@ -1,6 +1,6 @@
 {
   "name": "concierge",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "A simple fast async deferred event library",
   "main": "concierge.js",
   "scripts": {
@@ -26,7 +26,7 @@
   "devDependencies": {
     "chai": "*",
     "mocha": "*",
-    "shelve": "~1.2.0"
+    "shelve": "~2.0.0"
   },
   "engines": {
     "node": ">=0.6"

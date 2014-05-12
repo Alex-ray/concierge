@@ -3,14 +3,9 @@
 
   // Concierge
   function Concierge ( deferred ) {
-    this._callbacks = { } ;
-    this.deferred = deferred ;
+    this._deferred = deferred ;
   }
 
-  Concierge.prototype.on      = on ;
-  Concierge.prototype.off     = off ;
-  Concierge.prototype.once    = once ;
-  Concierge.prototype.emit    = emit ;
   Concierge.prototype.convert = convert ;
 
   /**
@@ -22,12 +17,12 @@
 
   function convert ( object ) {
 
-    object._callbacks = { } ;
-    object.deferred   = this.deferred ;
-    object.on   = this.on ;
-    object.off  = this.off ;
-    object.once = this.once ;
-    object.emit = this.emit ;
+    if ( typeof object._callbacks === "undefined" ) object._callbacks = { } ;
+    if ( typeof object._deferred  === "undefined" ) object._deferred  = this._deferred ;
+    if ( typeof object.on         === "undefined" ) object.on         = on ;
+    if ( typeof object.off        === "undefined" ) object.off        = off ;
+    if ( typeof object.once       === "undefined" ) object.once       = once ;
+    if ( typeof object.emit       === "undefined" ) object.emit       = emit ;
 
     return object ;
   }
@@ -39,49 +34,8 @@
    * @return {Object} emitter
    * @api public
    */
-
   function on ( event, fn ) {
-    if ( this._callbacks[ event ] === undefined ) {
-      this._callbacks[ event ] = [ ] ;
-    }
-
-    this._callbacks[ event ].push( fn ) ;
-
-    return this ;
-  }
-
-  /**
-   * Remove callback `fn` for `event` or remove all callbacks
-   * @param {String} event
-   * @param {Function} fn
-   * @return {Object} emitter
-   * @api public
-   */
-
-  function off ( event, fn ) {
-    if ( this._callbacks[ event ] === undefined ) {
-      this._callbacks = { } ;
-      return this ;
-    }
-
-    // remove all handlers
-    if ( fn === undefined ) {
-      delete this._callbacks[ event ] ;
-      return this ;
-    }
-
-    // remove specific handler
-    var cb ;
-
-    for ( var i = 0; i < this._callbacks[ event ].length; i++ ) {
-      cb = this._callbacks[ event ][ i ] ;
-      if ( cb === fn || cb.once === true ) {
-        this._callbacks[ event ].splice( i, 1 ) ;
-        break ;
-      }
-    }
-
-    return this ;
+    return _add( this, event, fn , false ) ;
   }
 
   /**
@@ -93,16 +47,50 @@
    */
 
   function once ( event, fn ) {
-    var self = this;
+    return _add( this, event, fn , true ) ;
+  }
 
-    function on ( ) {
-      fn.apply( this, arguments ) ;
+  /**
+   * Remove callback `fn` for `event` or remove all callbacks
+   * @param {String} event
+   * @param {Function} fn
+   * @return {Object} emitter
+   * @api public
+   */
+
+  function off ( event, fn ) {
+
+    // remove all handlers
+    if ( event === undefined ) {
+      this._callbacks = { } ;
+      return true ;
     }
 
-    on.once = true ;
-    this.on( event, on ) ;
+    if ( this._callbacks[ event ] === undefined ) {
+      return false ;
+    }
 
-    return this ;
+    // remove all event handlers
+    if ( fn === undefined ) {
+      delete this._callbacks[ event ] ;
+      return true ;
+    }
+
+    // remove specific handler
+    var cb ;
+
+    for ( var i = 0; i < this._callbacks[ event ].length; i++ ) {
+
+      cb = this._callbacks[ event ][ i ][ 0 ] ;
+
+      if ( cb === fn ) {
+        this._callbacks[ event ].splice( i, 1 ) ;
+        break ;
+      }
+
+    }
+
+    return true ;
   }
 
   /**
@@ -116,20 +104,20 @@
       return this ;
     }
 
-    var context = this ;
     var once    = [ ] ;
+    var all     = [ ] ;
     var args    = [ ].slice.call( arguments, 1 ) ;
     var cbs     = this._callbacks[ event ] ;
 
     for ( var i = 0; i < cbs.length; i++ ) {
-      var cb = cbs[ i ] ;
+      var cb     = cbs[ i ][ 0 ] ;
+      var isOnce = cbs[ i ][ 1 ] ;
 
-      if ( cb.once !== undefined ) {
+      if ( isOnce === true ) {
         once.push( i ) ;
       }
 
-      var cb = _generateCallback( cbs[ i ], context, args ) ;
-      this.deferred.defer( cb ) ;
+      all.push( cb ) ;
     }
 
     for ( var i = 0; i < once.length; i++ ) {
@@ -137,17 +125,26 @@
       this._callbacks[ event ].splice(  removeIndex , 1 ) ;
     }
 
+    for ( var i = 0; i < all.length; i++ ) {
+      var cb = _generateCallback( all[ i ]  , this, args ) ;
+      this._deferred.defer( cb ) ;
+    }
+
     return this ;
   }
 
-  /**
-   * creates a scoped callback that calls `cb` in the context of `context` with arguments `args`
-   * @param {Function} cb
-   * @param {Object} context
-   * @param {Array} args
-   * @return {Function} anonymous
-   * @api private
-   */
+  // PRIVATE
+
+  function _add ( context, event, fn, isOnce ) {
+    if ( context._callbacks[ event ] === undefined ) {
+      context._callbacks[ event ] = [ ] ;
+    }
+
+    context._callbacks[ event ].push( [ fn, isOnce ] ) ;
+
+    return true ;
+  }
+
   function _generateCallback ( cb, context, args ) {
     return function ( ) {
       cb.apply( context, args ) ;
